@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smartest - Ultimate Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary: #ec4899;
+            --iq-color: #0ea5e9;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --success: #10b981;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: var(--text-main); min-height: 100vh; padding: 20px; line-height: 1.7; }
+        .container { max-width: 900px; margin: 0 auto; }
+
+        /* HERO / HOME SCREEN */
+        #home-screen { padding: 20px 0 50px 0; }
+        .hero-banner {
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            color: white;
+            padding: 60px 30px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px -10px rgba(79, 70, 229, 0.4);
+            margin-bottom: 40px;
+        }
+        .hero-title { font-size: 3rem; font-weight: 800; margin-bottom: 15px; letter-spacing: -1px; }
+        .hero-subtitle { font-size: 1.1rem; opacity: 0.9; max-width: 600px; margin: 0 auto; font-weight: 400; }
+
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 25px; }
+        .menu-card { 
+            background: var(--card); padding: 40px 30px; border-radius: 24px; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.05); text-align: center;
+            border: 1px solid #e2e8f0;
+            position: relative; overflow: hidden;
+        }
+        .menu-card::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: var(--primary); transform: scaleX(0); transition: 0.3s;
+        }
+        .menu-card:hover::before { transform: scaleX(1); }
+        .menu-card:hover { transform: translateY(-10px); box-shadow: 0 20px 30px -5px rgba(0,0,0,0.1); border-color: transparent; }
+        .icon { font-size: 3.5rem; margin-bottom: 20px; display: inline-block; }
+        .menu-card h2 { font-size: 1.5rem; margin-bottom: 10px; font-weight: 700; }
+        .menu-card p { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* CARDS (TEST & RESULT) */
+        .card { 
+            background: var(--card); padding: 50px; border-radius: 30px; 
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08); display: none; 
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .active-card { display: block; }
+
+        /* PROGRESS */
+        .progress-section { margin-bottom: 40px; }
+        .bar-bg { height: 12px; background: #e2e8f0; border-radius: 20px; overflow: hidden; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--iq-color)); width: 0%; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .progress-text { display: flex; justify-content: space-between; margin-top: 12px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
+
+        /* QUESTIONS */
+        .question-text { font-size: 1.6rem; font-weight: 700; margin-bottom: 40px; text-align: center; min-height: 90px; color: #1e293b; }
+        
+        /* MULTI-CHOICE (IQ) */
+        .options-container { display: flex; flex-direction: column; gap: 15px; max-width: 600px; margin: 0 auto; }
+        .iq-btn { 
+            padding: 18px 25px; border: 2px solid #e2e8f0; border-radius: 16px; cursor: pointer; 
+            text-align: left; transition: all 0.2s; font-weight: 600; font-size: 1.05rem;
+            background: white; color: var(--text-main);
+        }
+        .iq-btn:hover { border-color: var(--iq-color); background: #f0f9ff; transform: scale(1.02); }
+        .iq-btn.active { background: var(--iq-color); color: white; border-color: var(--iq-color); box-shadow: 0 10px 15px -3px rgba(14, 165, 233, 0.3); }
+
+        /* LIKERT (MBTI & LOVE) */
+        .likert-container { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; max-width: 700px; margin: 0 auto; }
+        .likert-opt { flex: 1; text-align: center; cursor: pointer; transition: 0.2s; }
+        .circle { 
+            width: 50px; height: 50px; border: 3px solid #cbd5e1; border-radius: 50%; 
+            margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center; 
+            font-weight: 700; font-size: 1.1rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            background: white; color: var(--text-muted);
+        }
+        .likert-opt:hover .circle { border-color: var(--primary); transform: scale(1.1); }
+        .likert-opt.active .circle { background: var(--primary); border-color: var(--primary); color: white; transform: scale(1.15); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); }
+        .likert-label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); line-height: 1.2; }
+
+        /* NAV BUTTONS */
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 50px; border-top: 2px dashed #e2e8f0; padding-top: 30px; }
+        button { padding: 14px 35px; border: none; border-radius: 16px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+        .btn-back { background: #f1f5f9; color: var(--text-muted); }
+        .btn-back:hover:not(:disabled) { background: #e2e8f0; }
+        .btn-next { background: var(--primary); color: white; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2); }
+        .btn-next:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-2px); }
+
+        /* RESULTS */
+        .result-view { text-align: center; }
+        .res-badge { display: inline-block; background: #e0e7ff; color: var(--primary); padding: 8px 20px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; margin-bottom: 20px; }
+        .big-res { font-size: 4rem; font-weight: 900; color: var(--text-main); margin-bottom: 30px; letter-spacing: -2px; }
+        
+        .stats-grid { display: grid; gap: 15px; margin-bottom: 40px; }
+        .stat-row { background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; text-align: left; }
+        .stat-labels { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 10px; color: var(--text-main); }
+        .stat-bar { height: 10px; background: #e2e8f0; border-radius: 10px; overflow: hidden; }
+        .stat-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 10px;}
+        
+        .long-desc { text-align: left; background: #ffffff; padding: 40px; border-radius: 24px; border: 1px solid #e2e8f0; margin-top: 30px; line-height: 1.8; box-shadow: 0 10px 20px -5px rgba(0,0,0,0.02); }
+        .long-desc h2 { color: var(--primary); margin-bottom: 20px; font-size: 2rem; border-bottom: 3px solid #e0e7ff; padding-bottom: 15px; display: inline-block;}
+        .long-desc h3 { margin-top: 30px; color: #1e293b; font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+        .long-desc p { margin-bottom: 15px; color: #475569; font-size: 1.05rem; }
+        .long-desc ul { margin-left: 25px; margin-bottom: 15px; color: #475569; }
+        .long-desc li { margin-bottom: 8px; }
+
+        @media (max-width: 600px) {
+            .card { padding: 30px 20px; }
+            .hero-title { font-size: 2.2rem; }
+            .question-text { font-size: 1.2rem; }
+            .likert-container { gap: 5px; }
+            .circle { width: 40px; height: 40px; font-size: 0.9rem; }
+            .likert-label { font-size: 0.7rem; }
+            .long-desc { padding: 25px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div id="home-screen">
+        <div class="hero-banner">
+            <h1 class="hero-title">Smartest</h1>
+            <p class="hero-subtitle">Jelajahi kedalaman pikiran dan perasaanmu. Analisis psikometri yang dirancang dengan bahasa yang membumi, akurat, dan mudah dipahami.</p>
+        </div>
+        
+        <div class="menu-grid">
+            <div class="menu-card" onclick="startTest('mbti')">
+                <span class="icon">🧩</span>
+                <h2>Tes Kepribadian (MBTI)</h2>
+                <p>30 Soal | Temukan arketipe karakter, gaya kerjamu, dan cara terbaikmu berkembang.</p>
+            </div>
+            <div class="menu-card" onclick="startTest('love')">
+                <span class="icon">❤️</span>
+                <h2>Love Language</h2>
+                <p>30 Soal | Pahami caramu memberi dan menerima cinta agar hubungan lebih sehat.</p>
+            </div>
+            <div class="menu-card" onclick="startTest('iq')">
+                <span class="icon">💡</span>
+                <h2>Tes Logika (Estimasi IQ)</h2>
+                <p>30 Soal | Uji ketajaman kognitif, pengenalan pola, dan kecepatan analisismu.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" id="test-card">
+        <div class="progress-section">
+            <div class="bar-bg"><div class="bar-fill" id="bar"></div></div>
+            <div class="progress-text">
+                <span id="step-text"></span>
+                <span id="percent-text"></span>
+            </div>
+        </div>
+
+        <div class="question-box">
+            <p class="question-text" id="q-display"></p>
+            <div id="options-area"></div>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn-back" id="btn-back" onclick="prevQ()">← Kembali</button>
+            <button class="btn-next" id="btn-next" onclick="nextQ()">Lanjut →</button>
+        </div>
+    </div>
+
+    <div class="card result-view" id="result-card">
+        <div class="res-badge">Laporan Analisis Selesai</div>
+        <h1 class="big-res" id="res-main">----</h1>
+        <div class="stats-grid" id="res-stats"></div>
+        <div class="long-desc" id="res-detail"></div>
+        <button class="btn-next" style="margin-top:40px; width: 100%; padding: 20px; font-size: 1.1rem;" onclick="location.reload()">Kembali ke Beranda & Coba Tes Lain</button>
+    </div>
+
+</div>
+
+<script>
+    // --- DATABASE PERTANYAAN ---
+    const mbtiQ = [
+        { q: "Anda merasa sangat berenergi setelah menghabiskan waktu bersama banyak orang.", type: "EI" },
+        { q: "Anda lebih suka menghabiskan waktu luang sendirian dengan hobi yang tenang.", type: "IE" },
+        { q: "Anda cenderung memulai percakapan saat bertemu orang baru.", type: "EI" },
+        { q: "Anda merasa lelah secara mental setelah acara sosial yang panjang.", type: "IE" },
+        { q: "Anda lebih suka lingkungan kerja yang ramai daripada yang privat.", type: "EI" },
+        { q: "Anda sering berpikir masak-masak sebelum mengutarakan sesuatu.", type: "IE" },
+        { q: "Anda mudah bosan jika harus berdiam diri di rumah seharian.", type: "EI" },
+        { q: "Anda lebih nyaman bekerja di balik layar daripada menjadi pusat perhatian.", type: "IE" },
+        { q: "Anda lebih tertarik pada fakta nyata dan apa yang ada di depan mata daripada ide abstrak.", type: "SN" },
+        { q: "Anda sering membayangkan kemungkinan masa depan yang berbeda-beda.", type: "NS" },
+        { q: "Anda sangat memperhatikan detail kecil yang sering dilewatkan orang lain.", type: "SN" },
+        { q: "Anda lebih suka melihat gambaran besar (big picture) daripada teknis kecil.", type: "NS" },
+        { q: "Anda lebih percaya pada pengalaman masa lalu daripada insting/firasat.", type: "SN" },
+        { q: "Anda suka mencari makna simbolis atau pola tersembunyi di balik sebuah kejadian.", type: "NS" },
+        { q: "Anda adalah orang yang sangat praktis, membumi, dan realistis.", type: "SN" },
+        { q: "Logika dan rasionalitas harus selalu lebih diutamakan daripada perasaan pribadi.", type: "TF" },
+        { q: "Anda sangat peka dan mudah terpengaruh oleh suasana hati orang lain di sekitar Anda.", type: "FT" },
+        { q: "Anda lebih suka menang dalam debat logis daripada menjaga perasaan lawan bicara.", type: "TF" },
+        { q: "Anda sering membuat keputusan penting berdasarkan nilai kemanusiaan dan empati.", type: "FT" },
+        { q: "Keadilan yang objektif dan aturan yang sama untuk semua jauh lebih penting daripada belas kasihan.", type: "TF" },
+        { q: "Anda merasa sangat sulit mengatakan 'tidak' jika itu akan menyakiti perasaan orang lain.", type: "FT" },
+        { q: "Anda menilai kompetensi dan keahlian seseorang lebih tinggi daripada keramahtamahannya.", type: "TF" },
+        { q: "Anda merasa jauh lebih tenang jika segala sesuatu sudah terjadwal dan direncanakan dengan rapi.", type: "JP" },
+        { q: "Anda suka membiarkan pilihan tetap terbuka dan bertindak spontan sesuai situasi.", type: "PJ" },
+        { q: "Anda selalu berusaha menyelesaikan tugas jauh sebelum tenggat waktu (deadline) tiba.", type: "JP" },
+        { q: "Anda bekerja lebih baik dan mendapat banyak ide di bawah tekanan menit-menit terakhir.", type: "PJ" },
+        { q: "Kamar, meja kerja, atau file di komputer Anda biasanya sangat terorganisir.", type: "JP" },
+        { q: "Anda merasa terkekang dan stres jika jadwal hidup Anda terlalu diatur ketat.", type: "PJ" },
+        { q: "Anda selalu membuat rencana atau *itinerary* matang sebelum pergi berlibur.", type: "JP" },
+        { q: "Anda lebih suka hidup mengalir (go with the flow) daripada mengikuti aturan kaku.", type: "PJ" }
+    ];
+
+    const loveQ = [
+        { q: "Saya merasa sangat dicintai ketika seseorang secara tulus memberikan pujian atas usaha saya.", type: "W" },
+        { q: "Saya merasa sangat dihargai ketika pasangan mengambil alih pekerjaan rumah tanpa saya minta.", type: "A" },
+        { q: "Menerima kejutan kecil (seperti dibelikan camilan favorit) membuat hari saya terasa spesial.", type: "G" },
+        { q: "Waktu ngobrol berdua tanpa ada yang memegang HP adalah hal paling berharga bagi saya.", type: "Q" },
+        { q: "Sentuhan fisik ringan (seperti usapan di kepala atau punggung) sangat menenangkan emosi saya.", type: "P" },
+        { q: "Mendengar kata 'Aku bangga banget sama kamu' memberi saya energi luar biasa.", type: "W" },
+        { q: "Saya lebih percaya pada tindakan nyata ('action') daripada sekadar janji manis.", type: "A" },
+        { q: "Saya menyimpan hampir semua pemberian orang (surat, tiket, barang) karena itu adalah kenang-kenangan cinta.", type: "G" },
+        { q: "Jalan-jalan berdua di mobil sambil ngobrol ngalor-ngidul adalah kencan impian saya.", type: "Q" },
+        { q: "Duduk bersandar atau berpegangan tangan saat menonton TV sudah cukup membuat saya bahagia.", type: "P" },
+        { q: "Kata-kata dukungan saat saya sedang gagal sangat krusial untuk kewarasan mental saya.", type: "W" },
+        { q: "Ketika saya lelah, dimasakkan makanan atau dipijat jauh lebih berarti dari sekadar ucapan 'semangat'.", type: "A" },
+        { q: "Hadiah yang personal (menunjukkan dia tahu persis apa yang saya suka) membuat saya meleleh.", type: "G" },
+        { q: "Saya merasa sangat tidak dihargai kalau sedang bicara serius tapi lawan bicara sibuk main gadget.", type: "Q" },
+        { q: "Berpelukan erat saat bertemu atau berpisah adalah keharusan mutlak dalam hubungan.", type: "P" },
+        { q: "Pesan teks random di siang hari (seperti 'Lagi apa? Kangen') bisa membuat saya senyum-senyum sendiri.", type: "W" },
+        { q: "Saya merasa sangat dicintai ketika seseorang merawat saya dengan telaten saat saya sakit.", type: "A" },
+        { q: "Membawakan oleh-oleh (bahkan sekadar gantungan kunci) dari perjalanan jauh adalah tanda saya diingat.", type: "G" },
+        { q: "Melakukan aktivitas bersama (seperti masak bareng, main game bareng) memperkuat ikatan kami.", type: "Q" },
+        { q: "Saya sering tanpa sadar menyentuh lengan atau merangkul orang yang saya sayangi saat ngobrol.", type: "P" },
+        { q: "Saya merasa hampa dan 'insecure' jika tidak rutin mendengar kata 'Aku sayang kamu'.", type: "W" },
+        { q: "Membantu membereskan masalah birokrasi/teknis saya adalah cara terbaik menunjukkan kepedulian.", type: "A" },
+        { q: "Saya senang mengenakan atau memajang barang pemberian dari orang tercinta setiap hari.", type: "G" },
+        { q: "Menghabiskan akhir pekan penuh hanya berdua tanpa ada janji dengan orang lain sangat me-recharge saya.", type: "Q" },
+        { q: "Kontak mata yang dalam dan sentuhan fisik saat berdiskusi membuat saya merasa sangat terhubung secara batin.", type: "P" },
+        { q: "Menerima surat cinta atau kartu ucapan tulisan tangan jauh lebih bermakna daripada hadiah mahal.", type: "W" },
+        { q: "Saya merasa sangat diperhatikan ketika seseorang membawakan barang bawaan saya yang berat.", type: "A" },
+        { q: "Saya sangat menghargai ketika seseorang mengingat hal kecil yang ingin saya beli, lalu membelikannya.", type: "G" },
+        { q: "Mendengarkan keluh kesah saya dengan penuh empati tanpa memotong atau menasihati adalah hadiah terbesar.", type: "Q" },
+        { q: "Tidur sambil berpelukan membuat saya merasa berada di tempat paling aman di dunia.", type: "P" }
+    ];
+
+    const iqQ = [
+        { q: "Manakah angka selanjutnya dalam seri: 2, 4, 8, 16, ...?", opts: ["24","32","30","20"], correct: 1 },
+        { q: "Buku adalah untuk Membaca, seperti Garpu adalah untuk ...", opts: ["Memotong","Makan","Memasak","Mencuci"], correct: 1 },
+        { q: "Jika 3 mesin memproduksi 3 baju dalam 3 menit, berapa lama waktu yang dibutuhkan 100 mesin untuk memproduksi 100 baju?", opts: ["100 menit","30 menit","3 menit","1 menit"], correct: 2 },
+        { q: "Manakah yang tidak termasuk dalam kelompoknya?", opts: ["Paus","Hiu","Lumba-lumba","Anjing Laut"], correct: 1 },
+        { q: "Jika semua Mawar adalah bunga dan beberapa bunga cepat layu, kesimpulan yang pasti benar adalah...", opts: ["Beberapa mawar pasti layu","Semua mawar cepat layu","Tidak dapat disimpulkan pasti","Mawar tidak layu"], correct: 2 },
+        { q: "Angka berapa yang merupakan 1/4 dari 1/2 dari 80?", opts: ["20","10","5","40"], correct: 1 },
+        { q: "Hutan : Pohon = Perpustakaan : ...", opts: ["Rak","Buku","Kertas","Pustakawan"], correct: 1 },
+        { q: "Seorang anak berusia 4 tahun, kakaknya berusia dua kali lipat darinya. Ketika anak itu berusia 10 tahun, berapa usia kakaknya?", opts: ["20","14","16","12"], correct: 1 }, 
+        { q: "S, S, R, K, J, S, ... Huruf selanjutnya adalah?", opts: ["S","M","E","N"], correct: 1 },
+        { q: "Satu kata yang memiliki relasi makna paling dekat dengan 'Lembah' adalah...", opts: ["Bukit","Ngarai","Puncak","Gua"], correct: 1 },
+        { q: "Jika A > B dan B > C, apakah A pasti lebih besar dari C?", opts: ["Ya","Tidak","Tergantung nilai A","Tergantung nilai C"], correct: 0 },
+        { q: "Di antara desimal berikut, mana yang nilainya paling kecil?", opts: ["0.5","0.05","0.55","0.005"], correct: 3 },
+        { q: "Sebuah pesawat jatuh tepat di garis batas perbatasan Indonesia dan Malaysia. Di mana korban yang 'selamat' dimakamkan?", opts: ["Indonesia","Malaysia","Tidak dimakamkan","Di perbatasan"], correct: 2 },
+        { q: "Jika kata 'KUCING' disandikan menjadi 'GNICUK', maka 'TIKUS' disandikan menjadi...", opts: ["SUKIT","SUKTI","TSUKU","TIKSU"], correct: 0 },
+        { q: "Selesaikan persamaan ini: 7 + 7 ÷ 7 + 7 × 7 - 7 = ?", opts: ["0","43","50","56"], correct: 2 }, 
+        { q: "Apa yang memiliki 4 kaki di pagi hari, 2 kaki di siang hari, dan 3 kaki di malam hari? (Teka-teki Sphinx)", opts: ["Kambing","Meja","Manusia","Kursi"], correct: 2 },
+        { q: "Jika Anda sedang berlari dalam perlombaan dan berhasil menyalip orang di posisi kedua, Anda sekarang berada di posisi ke...?", opts: ["Pertama","Kedua","Ketiga","Keempat"], correct: 1 },
+        { q: "Angka selanjutnya dari deret Fibonacci: 1, 1, 2, 3, 5, 8, ...", opts: ["10","12","13","15"], correct: 2 },
+        { q: "Ibu Mary punya 5 anak: Nana, Nene, Nini, Nono. Siapakah nama anak ke-5?", opts: ["Nunu","Mary","Nany","Nona"], correct: 1 },
+        { q: "Sebuah jam analog menunjukkan tepat pukul 03:15. Berapa derajat sudut antara jarum pendek (jam) dan jarum panjang (menit)?", opts: ["0°","7.5°","15°","22.5°"], correct: 1 }, 
+        { q: "Benar atau Salah: 111.111.111 x 111.111.111 = 12.345.678.987.654.321", opts: ["Benar","Salah"], correct: 0 },
+        { q: "Di atas meja ada 3 buah apel. Jika Anda mengambil 2 apel, berapa apel yang Anda miliki sekarang?", opts: ["1","2","3","0"], correct: 1 },
+        { q: "Secara fisika massa, mana yang lebih berat: 1kg Kapas tebal atau 1kg Besi padat?", opts: ["Besi","Kapas","Keduanya sama berat","Tergantung volume"], correct: 2 },
+        { q: "Dalam satu tahun kalender Masehi, ada berapa bulan yang memiliki setidaknya 28 hari?", opts: ["1 bulan","6 bulan","12 bulan","Hanya Februari"], correct: 2 },
+        { q: "Seorang petani memiliki 17 ekor domba. Semua domba kecuali 9 ekor mati karena wabah. Berapa domba yang tersisa hidup?", opts: ["8","17","9","0"], correct: 2 },
+        { q: "Lanjutkan deret ini: 100, 90, 81, 73, ...", opts: ["66","65","64","70"], correct: 0 },
+        { q: "Antonim (lawan kata) yang paling tepat untuk kata 'SKEPTIS' adalah...", opts: ["Ragu-ragu","Mudah percaya","Keras kepala","Kritis"], correct: 1 },
+        { q: "Jika hari ini adalah hari setelah kemarin dan hari sebelum besok, hari apa hari ini?", opts: ["Kemarin","Besok","Hari ini","Tidak masuk akal"], correct: 2 },
+        { q: "Mana kota yang tidak memiliki karakteristik yang sama dengan yang lain? (Jakarta, Surabaya, Bandung, Tokyo)", opts: ["Jakarta","Surabaya","Tokyo","Bandung"], correct: 2 }, 
+        { q: "Berapa kali angka 9 muncul jika Anda menulis angka 1 sampai 100?", opts: ["10","19","20","21"], correct: 2 } 
+    ];
+
+    // --- LOGIC PERMAINAN ---
+    let currentTest = [];
+    let currentMode = "";
+    let currentIdx = 0;
+    let answers = [];
+
+    function startTest(mode) {
+        currentMode = mode;
+        if (mode === 'mbti') currentTest = mbtiQ;
+        else if (mode === 'love') currentTest = loveQ;
+        else currentTest = iqQ;
+
+        answers = new Array(currentTest.length).fill(null);
+        currentIdx = 0;
+        document.getElementById("home-screen").style.display = "none";
+        document.getElementById("test-card").classList.add("active-card");
+        renderQuestion();
+        window.scrollTo(0,0);
+    }
+
+    function renderQuestion() {
+        const q = currentTest[currentIdx];
+        document.getElementById("q-display").innerText = q.q;
+        document.getElementById("step-text").innerText = `Pertanyaan ${currentIdx + 1} dari ${currentTest.length}`;
+        const prog = Math.round(((currentIdx + 1) / currentTest.length) * 100);
+        document.getElementById("bar").style.width = prog + "%";
+        document.getElementById("percent-text").innerText = prog + "%";
+
+        const area = document.getElementById("options-area");
+        area.innerHTML = "";
+
+        if (currentMode === 'iq') {
+            q.opts.forEach((opt, i) => {
+                const btn = document.createElement("div");
+                btn.className = "iq-btn" + (answers[currentIdx] === i ? " active" : "");
+                btn.innerText = opt;
+                btn.onclick = () => { answers[currentIdx] = i; renderQuestion(); setTimeout(nextQ, 300); };
+                area.appendChild(btn);
+            });
+        } else {
+            const likert = document.createElement("div");
+            likert.className = "likert-container";
+            const labels = ["Sangat<br>Setuju", "Setuju", "Netral", "Tidak<br>Setuju", "Sangat<br>Tidak"];
+            const vals = [2, 1, 0, -1, -2];
+            vals.forEach((v, i) => {
+                const opt = document.createElement("div");
+                opt.className = "likert-opt" + (answers[currentIdx] === v ? " active" : "");
+                const size = i === 2 ? 40 : (i === 1 || i === 3 ? 45 : 55);
+                opt.innerHTML = `<div class="circle" style="width:${size}px; height:${size}px">${String.fromCharCode(65+i)}</div><div class="likert-label">${labels[i]}</div>`;
+                opt.onclick = () => { answers[currentIdx] = v; renderQuestion(); setTimeout(nextQ, 350); };
+                likert.appendChild(opt);
+            });
+            area.appendChild(likert);
+        }
+        document.getElementById("btn-back").disabled = currentIdx === 0;
+        document.getElementById("btn-next").disabled = answers[currentIdx] === null;
+    }
+
+    function nextQ() {
+        if (currentIdx < currentTest.length - 1) { currentIdx++; renderQuestion(); }
+        else { showResult(); }
+    }
+    function prevQ() { if (currentIdx > 0) { currentIdx--; renderQuestion(); } }
+
+    function showResult() {
+        document.getElementById("test-card").classList.remove("active-card");
+        document.getElementById("result-card").classList.add("active-card");
+        window.scrollTo(0,0);
+        
+        const resMain = document.getElementById("res-main");
+        const resDetail = document.getElementById("res-detail");
+        const resStats = document.getElementById("res-stats");
+
+        if (currentMode === 'mbti') {
+            let s = {E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0};
+            answers.forEach((ans, i) => {
+                const t = mbtiQ[i].type;
+                if (ans > 0) s[t[0]] += ans; else if (ans < 0) s[t[1]] += Math.abs(ans);
+                else { s[t[0]] += 0.5; s[t[1]] += 0.5; }
+            });
+            let type = (s.E>=s.I?'E':'I')+(s.S>=s.N?'S':'N')+(s.T>=s.F?'T':'F')+(s.J>=s.P?'J':'P');
+            resMain.innerText = type;
+            resStats.innerHTML = createMbtiBars(s);
+            resDetail.innerHTML = getMbtiLongDesc(type);
+        } else if (currentMode === 'love') {
+            let s = {W:0,A:0,G:0,Q:0,P:0};
+            answers.forEach((ans, i) => { s[loveQ[i].type] += (ans + 2); }); 
+            const top = Object.entries(s).sort((a,b)=>b[1]-a[1])[0][0];
+            const names = {W:"Words of Affirmation", A:"Acts of Service", G:"Receiving Gifts", Q:"Quality Time", P:"Physical Touch"};
+            resMain.innerText = names[top];
+            resMain.style.fontSize = "3rem";
+            resStats.innerHTML = createLoveBars(s);
+            resDetail.innerHTML = getLoveLongDesc(top);
+        } else {
+            let correct = 0;
+            answers.forEach((ans, i) => { if (ans === iqQ[i].correct) correct++; });
+            
+            let iqScore = 75 + (correct * 1.8); 
+            if (correct >= 28) iqScore += 5; 
+            if (correct === 30) iqScore += 5;
+
+            resMain.innerText = `Skor: ${Math.round(iqScore)}`;
+            resDetail.innerHTML = getIqLongDesc(iqScore, correct);
+        }
+    }
+
+    function createMbtiBars(s) {
+        const d = [
+            ['E','I','Ekstrovert vs Introvert (Fokus Energi)'],
+            ['S','N','Sensing vs Intuition (Cara Memproses Info)'],
+            ['T','F','Thinking vs Feeling (Pengambilan Keputusan)'],
+            ['J','P','Judging vs Perceiving (Gaya Hidup & Struktur)']
+        ];
+        return d.map(x => {
+            const total = s[x[0]] + s[x[1]];
+            const p = total === 0 ? 50 : Math.round((s[x[0]]/total)*100);
+            return `
+            <div class="stat-row">
+                <div style="font-size:0.85rem; color:#64748b; margin-bottom:5px; text-align:center">${x[2]}</div>
+                <div class="stat-labels"><span>${x[0]} (${p}%)</span><span>${x[1]} (${100-p}%)</span></div>
+                <div class="stat-bar"><div class="stat-fill" style="width:${p}%"></div></div>
+            </div>`;
+        }).join("");
+    }
+
+    function createLoveBars(s) {
+        const total = Object.values(s).reduce((a,b)=>a+b,0);
+        const names = {W:"Words of Affirmation", A:"Acts of Service", G:"Receiving Gifts", Q:"Quality Time", P:"Physical Touch"};
+        const sorted = Object.entries(s).sort((a,b)=>b[1]-a[1]);
+        
+        return sorted.map(([k,v]) => {
+            const p = total === 0 ? 0 : Math.round((v/total)*100);
+            return `
+            <div class="stat-row">
+                <div class="stat-labels"><span>${names[k]}</span><span>${p}%</span></div>
+                <div class="stat-bar"><div class="stat-fill" style="width:${p}%; background:var(--secondary)"></div></div>
+            </div>`;
+        }).join("");
+    }
+
+    // --- DATABASE PENJELASAN ---
+    function getMbtiLongDesc(t) {
+        const data = {
+            "INTJ": "<h2>Sang Arsitek (Architect)</h2><p>Anda adalah pemikir strategis yang visioner, rasional, dan mandiri. Anda jarang puas dengan keadaan status quo dan selalu mencari cara untuk mengoptimalkan sistem, proses, maupun diri Anda sendiri.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>Rasionalitas tingkat tinggi dan analitis.</li><li>Sangat mandiri dan percaya pada visi sendiri meski ditentang.</li><li>Mampu melihat gambaran besar (helikopter view) ke masa depan.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Sering dianggap terlalu kritis atau tidak peka secara emosional.</li><li>Cenderung overthinking pada detail yang tidak sempurna.</li><li>Bisa menjadi arogan jika merasa idenya paling benar.</li></ul><h3>💼 Karier yang Cocok:</h3><p>Insinyur Perangkat Lunak, Analis Keuangan, Arsitek Sistem, Ilmuwan, atau Strategis Bisnis.</p><h3>❤️ Dalam Hubungan:</h3><p>Anda mencari pasangan yang bisa menjadi rekan diskusi intelektual. Anda bukan orang yang romantis secara klise, tetapi Anda menunjukkan cinta dengan memecahkan masalah pasangan Anda dan setia berkomitmen pada rencana jangka panjang bersama.</p>",
+            
+            "INTP": "<h2>Sang Ahli Logika (Logician)</h2><p>Anda memiliki rasa ingin tahu intelektual yang tak ada habisnya. Anda suka membongkar konsep, mencari kebenaran absolut, dan merakit ulang ide-ide kompleks di kepala Anda.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>Kreativitas pemecahan masalah yang *out of the box*.</li><li>Pemikir abstrak yang sangat brilian.</li><li>Terbuka terhadap ide baru asalkan masuk akal secara logika.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Sering menunda-nunda pekerjaan nyata karena terlalu asyik di alam pikiran.</li><li>Sulit mengekspresikan empati pada emosi orang lain.</li><li>Cenderung mengabaikan rutinitas praktis sehari-hari.</li></ul><h3>💼 Karier yang Cocok:</h3><p>Programmer, Data Scientist, Peneliti Fisika/Matematika, Filsuf, Analis Sistem.</p>",
+
+            "ENTJ": "<h2>Sang Komandan (Commander)</h2><p>Anda adalah pemimpin alami. Terlahir dengan karisma, visi yang jelas, dan kemauan keras untuk mengorganisir orang dan sumber daya demi mencapai efisiensi maksimal.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>Sangat produktif, efisien, dan fokus pada target.</li><li>Kepercayaan diri yang menular dan karismatik.</li><li>Berani mengambil keputusan sulit tanpa ragu.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Bisa bersikap otoriter, keras kepala, dan mendominasi.</li><li>Tidak toleran terhadap inefisiensi atau kesalahan orang lain.</li><li>Sering mengesampingkan perasaan demi hasil.</li></ul><h3>💼 Karier yang Cocok:</h3><p>CEO, Pengacara, Konsultan Manajemen, Hakim, Pengusaha.</p>",
+
+            "ENTP": "<h2>Sang Pendebat (Debater)</h2><p>Anda sangat cerdas, jenaka, dan suka tantangan intelektual. Tidak ada yang lebih menyenangkan bagi Anda selain berdebat dan menguji batasan dari sebuah aturan atau pemikiran.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>*Brainstorming* tingkat dewa, selalu punya ide cemerlang.</li><li>Cepat tanggap, komunikator handal, dan berani.</li><li>Sangat mudah beradaptasi dengan perubahan.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Sering memulai banyak proyek tapi jarang menyelesaikannya.</li><li>Suka berdebat hanya untuk kesenangan, yang bisa membuat orang lain lelah.</li><li>Mudah bosan pada hal yang repetitif.</li></ul><h3>💼 Karier yang Cocok:</h3><p>Pengusaha, Pengacara, Copywriter, Inovator, Konsultan Politik.</p>",
+
+            "INFJ": "<h2>Sang Advokat (Advocate)</h2><p>Tipe kepribadian paling langka (hanya sekitar 1-2% dari populasi). Anda adalah seorang idealis yang memiliki prinsip teguh namun sekaligus memiliki kelembutan hati untuk membantu orang lain.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>Empati yang sangat dalam, mampu membaca 'ruang' emosi orang lain.</li><li>Punya visi yang kuat tentang moralitas dan kemanusiaan.</li><li>Kreatif dan perfeksionis dalam karya.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Sangat rentan terhadap kelelahan mental (*burnout*).</li><li>Sering menyembunyikan masalah sendiri demi membantu orang lain.</li><li>Perfeksionisme ekstrim yang menghambat diri.</li></ul><h3>💼 Karier yang Cocok:</h3><p>Psikolog, Penulis, Pekerja Sosial, Desainer UX, HR Manager.</p><h3>❤️ Dalam Hubungan:</h3><p>Anda butuh koneksi jiwa yang mendalam, bukan sekadar hubungan fisik atau status. Jika Anda percaya pada seseorang, Anda akan memberikan kesetiaan tanpa batas.</p>",
+
+            "INFP": "<h2>Sang Mediator (Mediator)</h2><p>Anda adalah jiwa puitis, baik hati, dan selalu mencari kebaikan bahkan di tempat terburuk sekalipun. Hidup Anda dipandu oleh core-value internal yang sangat kuat.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>Sangat berempati, tulus, dan tidak menghakimi.</li><li>Kreativitas imajinatif kelas tinggi, sering berbakat seni/menulis.</li><li>Dedikasi tinggi pada orang dan prinsip yang Anda sayangi.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Terlalu idealis sehingga sering kecewa pada dunia nyata.</li><li>Sangat tidak menyukai konflik, sering memendam perasaan.</li><li>Sulit berurusan dengan data mentah atau logistik yang kaku.</li></ul><h3>💼 Karier yang Cocok:</h3><p>Penulis Novel, Desainer Grafis, Terapis, Konselor, Animator.</p>",
+
+            "ENFJ": "<h2>Sang Protagonis (Protagonist)</h2><p>Anda adalah pemimpin karismatik yang digerakkan oleh perasaan (feeling). Fokus utama Anda adalah menginspirasi dan membantu orang lain mencapai potensi maksimal mereka.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>Toleran, bisa dipercaya, dan pemimpin yang memotivasi.</li><li>Ahli komunikasi dan ahli membangun jaringan sosial.</li><li>Tulus peduli pada kesejahteraan komunitas.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Terlalu peduli pada opini orang lain (people-pleaser).</li><li>Sering mengorbankan diri sendiri demi kebahagiaan orang lain.</li><li>Sulit membuat keputusan logis yang keras jika harus menyakiti seseorang.</li></ul><h3>💼 Karier yang Cocok:</h3><p>Guru/Dosen, PR, Direktur HRD, Politikus Etis, Motivator.</p>",
+
+            "ENFP": "<h2>Sang Juru Kampanye (Campaigner)</h2><p>Anda adalah jiwa bebas sejati. Sangat ramah, energik, dan selalu melihat hidup sebagai sebuah petualangan besar yang penuh koneksi antarmanusia.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>Sangat antusias, penasaran, dan observan.</li><li>Keterampilan komunikasi interpersonal yang luar biasa.</li><li>Bisa menemukan kesenangan di mana saja.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Sangat buruk dalam administrasi dan rutinitas terstruktur.</li><li>Mudah stres jika merasa terkekang.</li><li>Overthinking pada makna terselubung dari perilaku orang.</li></ul><h3>💼 Karier yang Cocok:</h3><p>Jurnalis, Event Organizer, Aktor, Sutradara, Spesialis Marketing.</p>",
+
+            "ISTJ": "<h2>Sang Ahli Logistik (Logistician)</h2><p>Tulang punggung masyarakat. Anda praktis, faktual, dedikasi tinggi, dan sangat menghargai tradisi serta aturan. Janji Anda adalah jaminan pasti.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>Sangat jujur, langsung, dan bertanggung jawab.</li><li>Tenang dan praktis dalam memecahkan krisis.</li><li>Kemampuan mengatur dan menegakkan tata tertib yang luar biasa.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Keras kepala dan sering menolak hal baru jika belum terbukti.</li><li>Sulit memahami emosi atau kebutuhan tidak logis orang lain.</li><li>Sering menyalahkan diri sendiri secara berlebihan jika gagal.</li></ul><h3>💼 Karier yang Cocok:</h3><p>Akuntan, Polisi/Militer, Manajer Operasional, Auditor, Dokter Gigi.</p>",
+
+            "ISFJ": "<h2>Sang Pembela (Defender)</h2><p>Hangat, protektif, dan selalu siap membela orang yang disayangi. Anda mengingat detail kecil tentang kehidupan orang lain yang menunjukkan betapa pedulinya Anda.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>Suportif, setia, dan sangat bisa diandalkan.</li><li>Memiliki keterampilan praktis yang teliti dan rapi.</li><li>Sangat sabar dalam situasi penuh tekanan.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Sering menekan perasaan sendiri (memendam).</li><li>Sulit menerima perubahan mendadak atau kritik terbuka.</li><li>Sering dimanfaatkan kebaikannya oleh orang yang salah.</li></ul><h3>💼 Karier yang Cocok:</h3><p>Perawat, Guru TK/SD, Pekerja Sosial, Administrasi Perkantoran, Customer Service.</p>",
+
+            "ESTJ": "<h2>Sang Eksekutif (Executive)</h2><p>Anda adalah representasi dari tradisi dan keteraturan. Anda menggunakan pemahaman yang jelas tentang apa yang benar, salah, dan wajar untuk menyatukan orang-orang.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>Berdedikasi tinggi, memiliki kemauan keras, dan loyal.</li><li>Senang menciptakan ketertiban dari kekacauan.</li><li>Penyelenggara tim dan proyek yang hebat.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Bisa terlalu kaku dan rewel (micromanagement).</li><li>Sulit rileks dan sering menghakimi hal yang tidak sesuai normanya.</li><li>Cenderung mengabaikan solusi emosional.</li></ul><h3>💼 Karier yang Cocok:</h3><p>Manajer Proyek, Manajer Pabrik, Hakim, CFO, Administrator Sekolah.</p>",
+
+            "ESFJ": "<h2>Sang Konsul (Consul)</h2><p>Orang-orang populer di sekolah atau kantor. Anda suportif, senang menolong, sangat sosial, dan peduli bahwa setiap orang di komunitas Anda baik-baik saja.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>Sangat peduli, hangat, dan peka terhadap kebutuhan nyata orang lain.</li><li>Sangat setia dan menjaga kewajiban sosial dengan baik.</li><li>Pintar mencairkan suasana.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Sangat rentan terhadap kritik atau konflik.</li><li>Terlalu mementingkan status sosial atau 'apa kata orang'.</li><li>Sulit berimprovisasi di luar rencana awal.</li></ul><h3>💼 Karier yang Cocok:</h3><p>PR, Perawat, Guru, Manajer Event, Resepsionis/Front Desk.</p>",
+
+            "ISTP": "<h2>Sang Pengrajin (Virtuoso)</h2><p>Anda adalah penjelajah dunia dengan indera sentuhan dan penglihatan. Anda suka membongkar barang, memahami cara kerjanya, dan menyatukannya kembali. Logis namun spontan.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>Optimis, energik, namun tetap santai.</li><li>Hebat dalam krisis, praktis memecahkan masalah langsung.</li><li>Tidak mudah panik dan fleksibel.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Sangat mudah bosan dan sering mengambil risiko bodoh demi sensasi.</li><li>Cenderung cuek dan tidak suka komitmen jangka panjang.</li><li>Sulit diprediksi oleh orang-orang di sekitarnya.</li></ul><h3>💼 Karier yang Cocok:</h3><p>Mekanik, Pilot, Atlet, Insinyur Perangkat Keras, Teknisi Forensik.</p>",
+
+            "ISFP": "<h2>Sang Petualang (Adventurer)</h2><p>Seorang seniman sejati. Namun bukan sekadar pelukis; Anda menggunakan estetika, desain, dan bahkan pilihan Anda untuk mendobrak batas konvensi sosial. Anda hidup di momen saat ini.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>Sangat imajinatif, penuh gairah, dan artistik.</li><li>Pesona alami yang hangat namun misterius.</li><li>Sangat toleran dan berpikiran terbuka terhadap orang lain.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Sangat mandiri hingga tingkat yang menghambat kolaborasi tim.</li><li>Fluktuasi harga diri (insecure) yang intens.</li><li>Benci rencana masa depan yang kaku.</li></ul><h3>💼 Karier yang Cocok:</h3><p>Desainer Mode, Fotografer, Koki (Chef), Musisi, Penata Rias.</p>",
+
+            "ESTP": "<h2>Sang Pengusaha (Entrepreneur)</h2><p>Hidup ini dinamis dan harus dijalani maksimal! Anda selalu berada di pusat perhatian, bertindak lebih dulu lalu memikirkan dampaknya nanti. Berani, praktis, dan berorientasi hasil.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>Berani, rasional, namun sangat praktis.</li><li>Kemampuan persepsi lingkungan yang sangat tajam.</li><li>Tahu cara bersosialisasi dengan semua kalangan.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Sering mengabaikan aturan jika dirasa merepotkan.</li><li>Gagal melihat gambaran atau dampak jangka panjang.</li><li>Sering tidak sabaran.</li></ul><h3>💼 Karier yang Cocok:</h3><p>Sales Broker, Paramedis, Polisi Detektif, Pialang Saham, Pengusaha Start-up.</p>",
+
+            "ESFP": "<h2>Sang Penghibur (Entertainer)</h2><p>Tidak ada yang bisa menghidupkan suasana seperti Anda! Anda spontan, energik, dan ingin memastikan semua orang di ruangan ikut bersenang-senang. Anda menyukai estetika dan gaya.</p><h3>🌟 Kekuatan Utama:</h3><ul><li>Observan yang sangat baik dalam membaca bahasa tubuh orang.</li><li>Sangat ramah, orisinal, dan punya estetika visual kuat.</li><li>Praktis dalam memberikan solusi di momen sekarang.</li></ul><h3>⚠️ Titik Buta (Kelemahan):</h3><ul><li>Sering menghindari konflik, lari dari masalah rumit.</li><li>Sangat buruk dalam perencanaan jangka panjang (uang, masa depan).</li><li>Mudah terdistraksi.</li></ul><h3>💼 Karier yang Cocok:</h3><p>Aktor, Pemandu Wisata, Desainer Interior, Event Planner, Spesialis PR.</p>"
+        };
+        
+        return data[t] || `<h2>Kombinasi Karakter Anda: ${t}</h2><p>Kami belum memiliki deskripsi lengkap untuk tipe Anda di database ini, namun secara garis besar Anda memiliki perpaduan antara aspek energi, pemrosesan informasi, pengambilan keputusan, dan gaya hidup yang sangat unik.</p>`;
+    }
+
+    function getLoveLongDesc(top) {
+        const data = {
+            W: "<h2>Words of Affirmation (Kata-kata Penegasan)</h2><p>Bagi Anda, pepatah <i>'Action speaks louder than words'</i> tidak sepenuhnya berlaku. Kata-kata memiliki kekuatan magis. Kalimat sederhana yang memvalidasi diri Anda bisa mengubah hari yang buruk menjadi luar biasa.</p><h3>💡 Cara Mencintai Anda:</h3><ul><li>Sering-sering mengirim pesan manis tanpa alasan.</li><li>Memuji penampilan atau pencapaian Anda secara spesifik (misal: 'Kamu hebat banget tadi bisa menyelesaikan presentasi itu').</li><li>Mengatakan 'Aku sayang kamu' atau 'Aku bangga padamu' dengan tulus.</li></ul><h3>🚫 Pantangan Terbesar (Menyakiti Anda):</h3><p>Kritik yang tajam, kalimat sarkas, cacian saat bertengkar, atau didiamkan (silent treatment). Karena kata-kata sangat penting bagi Anda, kata-kata negatif akan terekam sangat lama di memori dan sulit dimaafkan.</p>",
+            
+            A: "<h2>Acts of Service (Tindakan Pelayanan)</h2><p>Bagi Anda, cinta adalah kata kerja. Anda tidak butuh puisi romantis atau bunga yang akan layu. Anda butuh pasangan yang melihat Anda kewalahan dan berkata, <i>'Biar aku yang kerjakan ini'</i>.</p><h3>💡 Cara Mencintai Anda:</h3><ul><li>Membantu pekerjaan rumah tangga (cuci piring, beres-beres) tanpa diminta.</li><li>Membantu urusan birokrasi, service kendaraan, atau membelikan barang kebutuhan sehari-hari yang habis.</li><li>Menyiapkan sarapan atau membuatkan kopi saat Anda sibuk.</li></ul><h3>🚫 Pantangan Terbesar (Menyakiti Anda):</h3><p>Orang yang 'omdo' (omong doang). Janji membantu tapi lupa, menciptakan kekacauan lebih banyak (misal: membiarkan rumah berantakan sehingga beban kerja Anda bertambah), atau mengabaikan permintaan tolong Anda.</p>",
+
+            G: "<h2>Receiving Gifts (Menerima Hadiah)</h2><p>Jangan salah sangka, bahasa cinta ini BUKAN berarti materialistis. Bagi Anda, hadiah adalah simbol nyata dari pemikiran dan usaha. Hadiah membuktikan bahwa saat tidak bersama, pasangan Anda melihat sesuatu dan memikirkan Anda.</p><h3>💡 Cara Mencintai Anda:</h3><ul><li>Memberikan kejutan kecil secara acak (membawakan kopi atau martabak kesukaan).</li><li>Memberikan hadiah ulang tahun yang sangat personal, bukan sekadar mahal.</li><li>Membelikan barang yang sempat Anda sebutkan secara sekilas berbulan-bulan yang lalu.</li></ul><h3>🚫 Pantangan Terbesar (Menyakiti Anda):</h3><p>Melupakan hari jadi/ulang tahun, memberikan hadiah dengan asal-asalan yang tidak mencerminkan siapa Anda, atau menyepelekan hadiah yang Anda berikan kepada mereka.</p>",
+
+            Q: "<h2>Quality Time (Waktu Berkualitas)</h2><p>Bagi Anda, perhatian penuh (undivided attention) adalah bentuk cinta tertinggi. Kehadiran fisik tidak cukup jika pikirannya berada di tempat lain. Anda butuh pasangan yang benar-benar 'hadir'.</p><h3>💡 Cara Mencintai Anda:</h3><ul><li>Mengagendakan waktu rutin khusus untuk kencan berdua.</li><li>Meletakkan HP (menjauhkan distraksi) saat sedang mengobrol.</li><li>Melakukan aktivitas bersama, bertukar pikiran, atau hobi.</li></ul><h3>🚫 Pantangan Terbesar (Menyakiti Anda):</h3><p>Pasangan yang terus-menerus membatalkan janji, sibuk dengan ponsel saat sedang makan bersama, tidak mendengarkan cerita Anda, atau sering menyela obrolan Anda.</p>",
+
+            P: "<h2>Physical Touch (Sentuhan Fisik)</h2><p>Anda menangkap dan mengkomunikasikan rasa aman secara emosional melalui sentuhan fisik. Pelukan dari orang tercinta bisa secara instan menurunkan detak jantung dan stres Anda setelah hari yang melelahkan.</p><h3>💡 Cara Mencintai Anda:</h3><ul><li>Bergandengan tangan saat berjalan bersama.</li><li>Usapan lembut di punggung, kepala, atau bahu.</li><li>Pelukan panjang yang hangat, dan gestur kedekatan saat menonton tv bersama.</li></ul><h3>🚫 Pantangan Terbesar (Menyakiti Anda):</h3><p>Penolakan fisik saat Anda ingin bermanja, dihindari secara fisik saat marah, atau hubungan jarak jauh (LDR) tanpa komitmen pertemuan rutin yang jelas—karena kurangnya sentuhan membuat Anda merasa tidak dicintai.</p>"
+        };
+        return data[top];
+    }
+
+    function getIqLongDesc(score, correct) {
+        let level = score >= 130 ? "Sangat Superior (Genius Level)" : (score >= 120 ? "Superior" : (score >= 110 ? "Di Atas Rata-rata" : (score >= 90 ? "Rata-rata (Normal)" : "Di Bawah Rata-rata")));
+        
+        return `
+        <h2>Klasifikasi Kognitif: ${level}</h2>
+        <p>Anda berhasil menjawab benar <strong>${correct} dari 30 soal</strong> yang disajikan.</p>
+        
+        <h3>🧠 Analisis Gaya Berpikir Anda:</h3>
+        <p>Skor ini mencerminkan dominasi Anda pada kemampuan logika-matematika, pengenalan pola spasial/abstrak, dan kecepatan penalaran (*fluid intelligence*). Berdasarkan klasifikasi skor Anda:</p>
+        <ul>
+            ${score >= 120 ? 
+                "<li>Anda memiliki otak analitis yang tajam. Sangat mudah melihat benang merah pada masalah rumit.</li><li>Anda cepat belajar konsep baru tanpa perlu pengulangan berkali-kali.</li><li>Cocok untuk bidang sains, teknologi, strategi tingkat tinggi, atau analisis data.</li>" : 
+             (score >= 90 ? 
+                "<li>Kemampuan nalar dan logika Anda sangat baik dan seimbang untuk menavigasi kehidupan sehari-hari.</li><li>Anda mampu mengambil keputusan praktis berdasarkan informasi yang tersedia.</li><li>Punya kapasitas yang cukup besar untuk terus dilatih (neuroplastisitas).</li>" : 
+                "<li>Gaya belajar Anda mungkin tidak bertumpu pada tes pilihan ganda kaku, melainkan pada kecerdasan praktis atau kinestetik.</li>")}
+        </ul>
+
+        <h3>⚠️ Catatan Penting & Disclaimer:</h3>
+        <p>Alat ukur IQ berbasis web seperti ini hanya menilai sebagian kecil dari kecerdasan manusia (Logika & Matematika Dasar). Tes ini <strong>tidak</strong> mengukur Kecerdasan Emosional (EQ), kreativitas seni, kemampuan sosial, ketahanan mental (AQ), maupun kecerdasan musikal. Anggap skor ini sebagai permainan asah otak untuk mengetahui seberapa cepat *logical reasoning* Anda bekerja hari ini.</p>
+        `;
+    }
+</script>
+
+</body>
+</html>
